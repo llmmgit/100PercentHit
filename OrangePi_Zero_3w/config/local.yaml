@@ -1,0 +1,195 @@
+# 100 Percent Hit - Orange Pi Zero 3W V2.2 主配置
+# 所有速度、距离、增益和阈值均为建议初值，必须通过架空或低速实测确认。
+
+server:
+  host: "0.0.0.0"              # 网页监听地址。0.0.0.0表示允许同一网络中的设备访问。
+  port: 8080                    # 网页端口。家庭Wi-Fi和热点均使用此端口。
+  preview_fps: 24               # 手机预览帧率。调高更流畅但增加CPU和网络负载。
+  preview_width: 640            # 手机预览宽度。后台检测仍使用camera.width。
+  preview_height: 360           # 手机预览高度。降低图传负载，不影响后台检测分辨率。
+  jpeg_quality: 72              # JPEG质量0-100。调高画面更清晰但数据量更大。
+
+system:
+  shutdown_stop_repeat: 5       # 关机前重复发送STOP的次数。调大更稳健但关机稍慢。
+  shutdown_stop_interval_s: 0.05 # STOP重复间隔，单位秒。建议保持0.03-0.10。
+  shutdown_led_s: 1.5           # 暖白慢闪持续时间，之后调用systemctl poweroff。
+
+camera:
+  device: "/dev/video0"        # AR0234设备节点。用v4l2-ctl --list-devices确认。
+  width: 640                   # 采集宽度，需与摄像头支持格式匹配。
+  height: 480                   # 采集高度，需与摄像头支持格式匹配。
+  fps: 120                      # 请求采集帧率。实际帧率以网页和v4l2测试为准。
+  fourcc: "MJPG"               # 视频格式。MJPG通常可降低USB带宽和CPU拷贝压力。
+  flip_horizontal: true        # 水平翻转。后视相机左右方向不符时切换。
+  flip_vertical: false          # 垂直翻转。相机倒装时切换。
+
+vision:
+  detector: yolo
+  yolo_library: yolo/bin/libyolo_ball.so
+  yolo_model: yolo/models/yolov5n_ball_uint8.nb
+  yolo_fallback_to_hsv: false
+  h_center: 18                  # HSV色相中心，OpenCV范围0-179。用网页取色后保存。
+  s_center: 180                 # HSV饱和度中心，范围0-255。
+  v_center: 220                 # HSV亮度中心，范围0-255。
+  h_range: 10                   # 色相容差。调大更易检出，也更易误检。
+  s_range: 70                   # 饱和度容差。调大适应照明变化，也可能引入背景。
+  v_range: 70                   # 亮度容差。调大适应明暗变化，也可能引入背景。
+  min_area: 90                  # 最小轮廓面积，单位像素平方。过小会增加噪声。
+  max_area: 50000               # 最大轮廓面积。过小会在近距离丢球。
+  min_circularity: 0.55         # 最小圆度0-1。调高更严格，可能漏掉运动模糊目标。
+  morphology_kernel: 5          # 形态学核尺寸，建议奇数。调大去噪更强但会损失小目标。
+  sample_radius: 4              # 网页取色采样半径，单位像素。
+  draw_mask_preview: false      # true时网页显示HSV掩膜，调参完成后建议false。
+
+motion:
+  vx_output_sign: 1.0
+  vy_output_sign: -1.0
+  wz_output_sign: -1.0
+  auto_translation_limit: 1.40 # X/Y合成后的菱形速度包络，建议初值，待实测。
+  auto_translation_priority_y: false # true时Y前后轴优先，剩余额度分配给X横向。
+
+manual:
+  send_hz: 50                  # 3W向ESP32发送控制帧频率。
+  max_translation_mps: 1.4     # 协议满量程参考，不代表已标定的精确1.4m/s。
+  max_rotation_radps: 1.0      # 手动旋转上限，待架空测试确认。
+  heartbeat_timeout_ms: 450    # 手机手动控制超时后STOP，应小于ESP32 500ms保护。
+  takeover_joystick_deadband: 0.08 # 摇杆接管死区。超过此幅度且油门有效时转MANUAL。
+  takeover_throttle_min: 0.03  # 接管所需最小油门比例，避免零值心跳误触发。
+
+# 图像X轴横向跟踪。图像水平误差控制车体vy，所有数值均为建议初值、待实测。
+lateral_tracking:
+  enabled: true                 # true时ARM后连续识别小球会进入TRACKING并横移。
+  kp: 0.35                      # 速度优先X轴P增益，建议初值，待实测。
+  kd: 0                       # X轴D增益。第一阶段保持0，视觉稳定后再逐步增加。
+  center_deadband_norm: 0   # 中心死区，按图像半宽归一化；1280宽约对应正负22像素。
+  error_filter_alpha: 0.3      # 误差低通系数。越大响应快，越小更平滑。
+  min_vy: 0.2                  # 克服静摩擦的最小横移指令，待低速实测。
+  max_vy: 0.5                  # 自动横移最大协议速度尺度，非精确实测m/s。
+  fast_error_norm: 0.1          # 超过该水平误差后直接进入高速区，建议初值。
+  fast_vy: 0.5                  # X轴高速区速度，建议初值，待实测。
+  max_accel_vy_per_s: 2.5      # 横移指令每秒最大变化量，降低起步打滑。
+  acquire_confirm_frames: 1     # 连续识别多少帧后ARMED进入TRACKING。
+  lost_timeout_ms: 250          # 短时漏检窗口，待实测。
+  image_error_to_body_y_sign: 1.0 # 图像右偏对应vy方向；实测相反时改为-1。
+
+# 预测式Y轴/OAC：接球线位置反馈 + 视线速度前馈 + 短时预测。
+oac:
+  enabled: true                 # 启用Y/OAC。
+  kp: 2.0                       # 接球线位置反馈增益，建议初值，待实测。
+  kd: 0.8                      # 向上视线速度前馈增益，建议初值，待实测。
+  catch_y_norm: 0.72            # 期望小球保持的画面纵向接球线，建议初值。
+  lookahead_s: 0.18             # 按当前视线速度预测的前视时间，建议初值。
+  position_deadband_norm: 0.03  # 接球线位置死区，建议初值。
+  fast_error_norm: 0.11         # 位置误差超过此值直接使用高速区。
+  min_vx: 0.75                  # Y轴最小有效动作速度。
+  max_vx: 1.4                  # Y轴最大协议速度尺度。
+  rate_filter_alpha: 0.7       # 视线速度滤波，越大响应越快。
+  min_upward_rate: 0.005        # 向上运动判定阈值。
+  fast_vx: 1.4                 # Y轴高速区速度。
+  max_accel_vx_per_s: 20      # Y轴指令变化率上限。
+  lost_timeout_ms: 300          # Y轴丢球停止超时。
+  output_sign: 1.0              # 前后方向符号。
+  dropout_hold_ms: 150          # 普通漏检保持上一速度。
+  overtop_enabled: true         # 顶部快速出界后允许短时续冲。
+  overtop_y_norm: 0.18          # 顶部区域。
+  overtop_hold_ms: 300          # 顶部续冲时间上限。
+  overtop_vx: 1.4              # 顶部续冲速度。
+
+transport:
+  serial_device: "/dev/ttyS7" # Zero 3W UART7，物理16 TX、18 RX。
+  baud: 115200                 # 3W与ESP32串口波特率。
+  reconnect_s: 1.0             # 串口打开失败后的重试间隔。
+
+imu:
+  timeout_ms: 500              # BNO085数据新鲜度超时。超时后停止使用陈旧yaw。
+  required_for_arm: true       # true时没有新鲜IMU数据则拒绝ARM。
+  yaw_hold_enabled: true       # ARMED/TRACKING/AUTO_MOVE时启用相对航向保持。
+  yaw_deadband_deg: 1.5        # 航向死区。调大减少抖动，调小纠偏更积极。
+  yaw_kp_radps_per_deg: 0.025  # yaw比例增益建议初值。
+  yaw_kd_radps_per_dps: 0.006  # yaw微分增益建议初值。
+  yaw_max_wz_radps: 0.45       # 自动航向修正最大角速度。
+  yaw_sign: 1.0                # 航向修正方向。架空测试相反时改为-1.0。
+
+lidar:
+  enabled: true                # 是否启用LD14串口读取；false时完全不启动雷达线程。
+  control_enabled: true        # 是否参与BLOCKED控制；网页按钮可临时切换，重启后恢复此值。
+  required: false              # false表示LD14离线不阻止主程序启动。
+  direct_serial_device: "/dev/ttyS6" # LD14 TX连接的Zero 3W UART6 RX。
+  baud: 115200                 # LD14固定波特率。
+  active_modes: ["ARMED", "TRACKING", "AUTO_MOVE"] # 仅这些自动状态触发强制STOP。
+  sdk_angle_correction: true
+  angle_offset_deg: 174.0
+  sector_center_deg: 0.0       # 自动避障扇区中心。0度定义为车头正前方。
+  sector_width_deg: 90.0       # 自动避障扇区总宽度，当前为前方左右各45度。
+  ignore_sectors_deg:
+    - [120.0, 180.0]
+    - [-180.0, -120.0]
+  scan_bin_deg: 1.0
+  point_max_age_s: 0.45
+  offline_timeout_s: 0.60
+  min_confidence: 10           # 最低反射强度。调高抑制噪声，也可能漏低反射物。
+  stop_distance_m: 0.25        # 自动状态停车距离，单位米，待低速实测。
+  release_distance_m: 0.30     # 阻挡释放距离，必须大于停车距离形成滞回。
+  stop_confirm_frames: 2       # 连续多少帧命中才判定阻挡。
+  release_confirm_frames: 3    # 连续多少帧安全才解除雷达内部锁存。
+
+io:
+  enabled: true                # 是否启用物理ARM按钮及接球触点。
+  arm_line_name: "PE4"        # ARM按钮GPIO line名称，物理26脚，需用gpioinfo确认。
+  catch_line_name: "PL4"      # 接球触点GPIO line名称，物理28脚，需用gpioinfo确认。
+  active_low: true             # 按钮按下接地，因此低电平有效。
+  debounce_ms: 60              # 按键消抖时间。
+  network_switch_hold_s: 3.0  # 接球测试点长按此时间切换家庭Wi-Fi/3W热点。
+  shutdown_hold_s: 3.0         # 正常运行时连续按住ARM达到此时间则安全关机。
+
+ws2812:
+  enabled: true                # 是否启用11颗WS2812状态灯。
+  count: 11                    # 总灯数：车头1颗、左右状态灯2颗、尾部8颗。
+  front_count: 3               # 前三颗顺序固定为左、前、右。
+  tail_count: 8                # 尾部8颗，物理连接顺序需对应灯板DIN到DOUT。
+  spi_bus: 3                   # /dev/spidev3.0中的总线号3。
+  spi_cs: 0                    # /dev/spidev3.0中的片选号0。
+  spi_mode: 0                  # WS2812编码使用SPI mode 0。
+  bits_per_word: 8             # 每个SPI传输字8位。
+  spi_speed_hz: 2400000        # 约2.4MHz，使3个SPI位编码1个WS2812位。
+  no_cs: false                 # 恢复已验证的SPI配置，避免灯组全部无输出。
+  reset_bytes: 32              # 恢复原有帧尾低电平复位长度。
+  brightness: 30               # 全局亮度0-255。建议低亮度避免影响AR0234曝光。
+  refresh_hz: 8                # 动画刷新频率。瀑布流建议20Hz。
+  boot_color: [0, 80, 255]     # BOOT/选择窗口蓝色。
+  wifi_color: [0, 80, 255]     # 家庭Wi-Fi连接成功蓝色。
+  ap_color: [150, 40, 255]     # 热点选择及启用紫色。
+  safe_color: [255, 150, 0]    # SAFE黄色。
+  manual_color: [0, 90, 255]   # MANUAL蓝色。
+  armed_color: [0, 255, 80]    # ARMED绿色。
+  tracking_color: [0, 220, 255] # TRACKING青色。
+  auto_color: [0, 255, 40]     # AUTO_MOVE绿色。
+  blocked_color: [255, 70, 0]  # BLOCKED橙色。
+  success_color: [255, 255, 255] # SUCCESS白色。
+  fault_color: [255, 0, 0]     # FAULT红色。
+  shutdown_color: [255, 190, 120] # SHUTTING_DOWN暖白色。
+
+network:
+  auto_manage: true            # true时由程序管理家庭Wi-Fi与3W热点。
+  wifi_connection_name: "<YOUR_WIFI_CCONNECTIO_NAME>" # NetworkManager中家庭Wi-Fi连接名称。
+  ap_connection_name: "<YOUR_AP_CONNECTION_NAME>" # NetworkManager中3W热点连接名称。
+  ap_ssid: "<YOUR_AP_SSID>"    # 手机搜索到的热点名称。
+  ap_password: "<YOUR_AP_PASSWORD>" # 热点密码，至少8字符，部署前务必修改。
+  ap_address: "192.168.86.1/24" # 热点地址，网页地址为192.168.86.1:8080。
+  ready_confirm_s: 1.0         # 网络切换成功后的灯光确认时间。
+  error_confirm_s: 2.0         # 网络切换失败后的红灯反馈时间。
+
+battery:
+  enabled: true                # 是否显示ESP32上传的电池电压。
+  empty_voltage: 9.6          # 0%建议电压，必须按实际电池类型校准。
+  full_voltage: 12.45           # 100%建议电压，必须用万用表校准。
+  filter_window: 5
+  filter_alpha: 0.12
+  low_percent: 20              # 低电量提示阈值。
+
+catch:
+  enabled: true                # 是否启用硬件接球触点。
+  valid_modes: ["ARMED", "TRACKING", "AUTO_MOVE"] # 仅这些状态触发SUCCESS。
+
+future_servo:
+  enabled: false               # 自动X/OAC闭环尚未实测，默认关闭。

@@ -1,0 +1,875 @@
+:root {
+    --bg:#f5f7fb;
+    --card:rgba(255,255,255,.88);
+    --line:rgba(28,62,103,.08);
+    --text:#102447;
+    --muted:#64748b;
+    --blue:#1684ff;
+    --green:#20c773;
+    --red:#ff453a;
+    --yellow:#ffbf2f;
+    --orange:#ff8a25;
+    --shadow:0 10px 30px rgba(45,75,115,.10);
+}
+
+* {
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body {
+    margin:0;
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Segoe UI",sans-serif;
+}
+
+button,input {
+    font:inherit;
+}
+
+button {
+    border:0;
+    color:inherit;
+}
+
+.appShell {
+    width:min(100%,540px);
+    min-height:100dvh;
+    margin:auto;
+    padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    gap:12px;
+}
+
+.topPanel {
+    display:grid;
+    gap:10px;
+}
+
+.brandRow {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:2px 0;
+}
+
+.brandMark {
+    font-size:33px;
+    color:var(--blue);
+    font-weight:800;
+}
+
+.brandRow h1 {
+    font-size:22px;
+    line-height:1;
+    margin:0;
+    letter-spacing:.3px;
+}
+
+.brandRow p {
+    font-size:11px;
+    color:var(--muted);
+    margin:4px 0 0;
+}
+
+.statusGrid {
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:6px;
+}
+
+.statusChip {
+    min-width:0;
+    height:72px;
+    padding:9px 2px 7px;
+    border-radius:19px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid rgba(255,255,255,.92);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.statusChip .icon {
+    font-size:25px;
+    line-height:1;
+    color:var(--blue);
+    font-weight:700;
+}
+
+.statusChip>span:last-child {
+    font-size:11px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+}
+
+.statusChip.ok .icon {
+    color:var(--green);
+}
+
+.statusChip.hotspot .icon {
+    color:var(--blue);
+}
+
+.statusChip.warn .icon {
+    color:var(--orange);
+}
+
+.statusChip.bad .icon {
+    color:var(--red);
+}
+
+.actionGrid {
+    display:grid;
+    grid-template-columns:1.25fr repeat(3,1fr);
+    gap:9px;
+}
+
+.actionButton {
+    height:62px;
+    border-radius:19px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-weight:800;
+}
+
+.actionButton:active,.turnButton:active,.statusChip:active {
+    transform:scale(.96);
+}
+
+.actionIcon {
+    font-size:25px;
+}
+
+.actionButton.state.safe {
+    background:linear-gradient(145deg,#fff3c7,#ffd75c);
+}
+
+.actionButton.state.armed {
+    background:linear-gradient(145deg,#d8ffe9,#6eeaa9);
+}
+
+.actionButton.state.manual {
+    background:linear-gradient(145deg,#d9edff,#77b9ff);
+}
+
+.actionButton.state.blocked,.actionButton.state.fault {
+    background:linear-gradient(145deg,#ffe3da,#ff937e);
+}
+
+.actionButton.stop {
+    background:linear-gradient(145deg,#ffdedb,#ff7b73);
+    color:#fff;
+}
+
+.actionButton.neutral {
+    color:#46617f;
+}
+
+.actionButton.power {
+    background:#fff1f0;
+    color:var(--red);
+}
+
+.cameraCard {
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #111827;
+    box-shadow: var(--shadow);
+    aspect-ratio: 9 / 16;
+}
+
+.cameraCard img {
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:contain;
+}
+
+.liveDot {
+    position:absolute;
+    left:12px;
+    top:12px;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#21d67b;
+    box-shadow:0 0 0 5px rgba(0,0,0,.35);
+}
+
+.cameraInfo {
+    position:absolute;
+    right:10px;
+    top:9px;
+    padding:5px 9px;
+    border-radius:11px;
+    background:rgba(13,24,40,.68);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+}
+
+.streamFps {
+    position:absolute;
+    right:10px;
+    bottom:9px;
+    padding:5px 9px;
+    border-radius:11px;
+    background:rgba(13,24,40,.68);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+}
+
+.ballInfo {
+    position:absolute;
+    left:10px;
+    bottom:9px;
+    padding:5px 9px;
+    border-radius:11px;
+    background:rgba(13,24,40,.68);
+    color:#53f093;
+    font-size:12px;
+    font-weight:700;
+}
+
+.controlPanel {
+    display:grid;
+    align-content:start;
+    gap:13px;
+}
+
+.joystickRow {
+    display:grid;
+    grid-template-columns:72px 1fr 72px;
+    gap:9px;
+    align-items:start;
+}
+
+.turnButton {
+    height:72px;
+    margin-top:8px;
+    border-radius:22px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    font-size:32px;
+    font-weight:500;
+    color:#18365e;
+}
+
+.joystick {
+    justify-self:center;
+    width:min(52vw,230px);
+    aspect-ratio:1;
+    border-radius:50%;
+    position:relative;
+    touch-action:none;
+    background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.96) 0 22%,rgba(217,230,249,.78) 23% 62%,rgba(232,239,249,.82) 63%);
+    box-shadow:inset 0 0 0 1px rgba(35,90,160,.06),var(--shadow);
+}
+
+.knob {
+    position:absolute;
+    width:38%;
+    height:38%;
+    left:31%;
+    top:31%;
+    border-radius:50%;
+    background:linear-gradient(145deg,#56adff,#0877ee);
+    box-shadow:0 10px 22px rgba(17,113,226,.35);
+}
+
+.throttleCard {
+    height:58px;
+    padding:8px 15px 8px 10px;
+    border-radius:21px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    display:grid;
+    grid-template-columns:58px 1fr;
+    gap:9px;
+    align-items:center;
+}
+
+.throttleCard output {
+    height:42px;
+    border-radius:15px;
+    background:#f2f6fc;
+    display:grid;
+    place-items:center;
+    font-size:18px;
+    font-weight:800;
+}
+
+.throttleCard input {
+    width:100%;
+    accent-color:var(--blue);
+}
+
+input[type=range] {
+    appearance:none;
+    height:28px;
+    background:transparent;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height:8px;
+    border-radius:8px;
+    background:linear-gradient(90deg,var(--blue) 0 var(--fill,20%),#dce5f2 var(--fill,20%) 100%);
+}
+
+input[type=range]::-webkit-slider-thumb {
+    appearance:none;
+    width:28px;
+    height:28px;
+    margin-top:-10px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(23,55,92,.22);
+}
+
+.modal {
+    position:fixed;
+    inset:0;
+    z-index:20;
+    background:rgba(23,42,68,.20);
+    backdrop-filter:blur(12px);
+    display:grid;
+    place-items:end center;
+    padding:max(12px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom));
+}
+
+.hidden {
+    display:none;
+}
+
+.sheet {
+    width:min(100%,540px);
+    max-height:94dvh;
+    overflow:auto;
+    border-radius:28px;
+    background:rgba(247,249,252,.97);
+    box-shadow:0 24px 70px rgba(32,57,91,.20);
+    padding:14px;
+}
+
+.compactSheet {
+    margin-bottom:10px;
+}
+
+.sheetHead {
+    display:grid;
+    grid-template-columns:46px 1fr 46px;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.sheetHead h2 {
+    text-align:center;
+    margin:0;
+    font-size:20px;
+}
+
+.headSpacer {
+    width:46px;
+}
+
+.iconClose,.backButton {
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:var(--shadow);
+    font-size:25px;
+}
+
+.settingLink {
+    width:100%;
+    min-height:60px;
+    margin:8px 0;
+    padding:0 15px;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:var(--shadow);
+    display:grid;
+    grid-template-columns:34px 1fr 20px;
+    align-items:center;
+    text-align:left;
+}
+
+.settingLink span {
+    font-size:23px;
+    color:var(--blue);
+}
+
+.settingLink i {
+    text-align:right;
+    font-size:28px;
+    color:#9badc4;
+}
+
+.tabs {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    background:#e7edf5;
+    border-radius:14px;
+    padding:4px;
+    gap:3px;
+    position:sticky;
+    top:0;
+    z-index:2;
+}
+
+.tabs button {
+    height:38px;
+    border-radius:11px;
+    background:transparent;
+    font-weight:750;
+    color:#60728b;
+}
+
+.tabs button.active {
+    background:#fff;
+    color:var(--blue);
+    box-shadow:0 3px 11px rgba(34,68,108,.10);
+}
+
+.settingsRows {
+    display:grid;
+    gap:12px;
+    margin:13px 0;
+}
+
+.settingGroup {
+    border-radius:21px;
+    background:#fff;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+.settingGroupTitle {
+    padding:14px 15px 8px;
+    font-weight:800;
+    color:#26476e;
+}
+
+.settingRow {
+    min-height:55px;
+    padding:8px 15px;
+    border-top:1px solid var(--line);
+    display:grid;
+    grid-template-columns:132px 1fr 58px;
+    gap:8px;
+    align-items:center;
+}
+
+.settingRow>span {
+    font-size:14px;
+}
+
+.settingRow output {
+    text-align:right;
+    color:#657895;
+    font-weight:700;
+}
+
+.settingRow input[type=range] {
+    width:100%;
+}
+
+.toggleRow {
+    grid-template-columns:1fr auto;
+}
+
+.toggleRow input {
+    width:48px;
+    height:28px;
+}
+
+.settingActions {
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    position:sticky;
+    bottom:0;
+    padding-top:10px;
+    background:linear-gradient(transparent,#f7f9fc 30%);
+}
+
+.settingActions button {
+    height:46px;
+    border-radius:15px;
+    font-weight:800;
+}
+
+.secondary {
+    background:#e9eff7;
+    color:#3b5575;
+}
+
+.primary {
+    background:var(--blue);
+    color:#fff;
+}
+
+@media(max-width:380px) {
+    .appShell {
+        padding-left:9px;
+        padding-right:9px;
+    }
+
+    .statusGrid {
+        gap:4px;
+    }
+
+    .statusChip {
+        height:67px;
+        border-radius:17px;
+    }
+
+    .statusChip .icon {
+        font-size:22px;
+    }
+
+    .statusChip>span:last-child {
+        font-size:10px;
+    }
+
+    .joystickRow {
+        grid-template-columns:62px 1fr 62px;
+    }
+
+    .turnButton {
+        height:62px;
+    }
+
+    .actionButton {
+        height:56px;
+    }
+
+    .settingRow {
+        grid-template-columns:112px 1fr 50px;
+    }
+
+}
+
+.appShell {
+    grid-template-rows:auto auto 1fr auto;
+}
+
+.statusChip .icon {
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+}
+
+.statusChip .icon svg {
+    width:28px;
+    height:28px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.statusChip .icon .iconFill {
+    fill:currentColor;
+    stroke:none;
+}
+
+.sampleColorBtn {
+    position:absolute;
+    left:10px;
+    top:34px;
+    z-index:3;
+    height:30px;
+    padding:0 12px;
+    border-radius:12px;
+    background:rgba(13,24,40,.72);
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+}
+
+.sampleColorBtn.active {
+    background:var(--blue);
+}
+
+.sampleHint {
+    position:absolute;
+    z-index:3;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    padding:9px 14px;
+    border-radius:14px;
+    background:rgba(13,24,40,.78);
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    pointer-events:none;
+}
+
+.cameraCard.sampling {
+    cursor:crosshair;
+    box-shadow:0 0 0 3px rgba(22,132,255,.55),var(--shadow);
+}
+
+.appFooter {
+    text-align:center;
+    color:#94a3b8;
+    font-size:10px;
+    padding-top:2px;
+}
+
+.sampleReadout {
+    padding:10px 15px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--muted);
+}
+
+.statusChip.bypass {
+    background:linear-gradient(145deg,#efe7ff,#c9b2ff);
+}
+
+.statusChip.bypass .icon {
+    color:#7c4dff;
+}
+
+.statusChip:disabled {
+    cursor:default;
+    opacity:.72;
+    transform:none;
+}
+
+.cameraInfo,
+.streamFps {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+.sampleColorBtn {
+    left: auto !important;
+    right: 10px !important;
+    top: 9px !important;
+}
+
+
+/* 六列对齐布局：与顶部六个状态按钮使用相同列宽和间距。 */
+.visionControlRow {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 6px;
+    align-items: start;
+    width: 100%;
+}
+
+.verticalThrottle {
+    grid-column: 1 / 2;
+    width: 100%;
+    height: 306px;
+    min-width: 0;
+    padding: 10px 6px 8px;
+    border-radius: 19px;
+    display: grid;
+    grid-template-rows: 1fr 42px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+}
+
+.verticalThrottle input[type="range"] {
+    width: 28px;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    touch-action: none;
+}
+
+.verticalThrottle input[type="range"]::-webkit-slider-runnable-track {
+    width: 8px;
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(
+        to top,
+        var(--blue) 0 var(--fill, 40%),
+        #dce5f2 var(--fill, 40%) 100%
+    );
+}
+
+.verticalThrottle input[type="range"]::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+    margin-top: 0;
+    margin-left: -10px;
+}
+
+.verticalThrottle input[type="range"]::-moz-range-track {
+    width: 8px;
+    height: 100%;
+    border-radius: 8px;
+    background: #dce5f2;
+}
+
+.verticalThrottle input[type="range"]::-moz-range-progress {
+    width: 8px;
+    border-radius: 8px;
+    background: var(--blue);
+}
+
+.verticalThrottle output {
+    width: 100%;
+    height: 42px;
+    font-size: 16px;
+}
+
+.cameraCard {
+    grid-column: 2 / 6;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    align-self: start;
+}
+
+.sideActions {
+    grid-column: 6 / 7;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 72px);
+    gap: 6px;
+    width: 100%;
+    height: 306px;
+    align-self: start;
+}
+
+.sideActions .actionButton {
+    width: 100%;
+    height: 72px;
+    min-width: 0;
+    min-height: 0;
+    padding: 4px 2px;
+    border-radius: 19px;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11px;
+    overflow: hidden;
+}
+
+.sideActions .actionIcon {
+    font-size: 25px;
+    line-height: 1;
+}
+
+.sideActions #mode {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.joystickRow {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 6px;
+    align-items: start;
+}
+
+.turnButton {
+    width: 100%;
+    height: 72px;
+    margin-top: 8px;
+    border-radius: 19px;
+}
+
+#left {
+    grid-column: 1 / 2;
+}
+
+#joy {
+    grid-column: 2 / 6;
+    grid-row: 1;
+}
+
+#right {
+    grid-column: 6 / 7;
+}
+
+@media (max-width: 380px) {
+    .visionControlRow,
+    .joystickRow {
+        column-gap: 6px;
+    }
+}
+
+/* V4：所有六列控制按钮在不同屏幕宽度下保持正方形。 */
+.statusChip {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+}
+
+.sideActions {
+    height: auto;
+    grid-template-rows: repeat(4, auto);
+}
+
+.sideActions .actionButton {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+}
+
+.verticalThrottle {
+    height: 100%;
+    aspect-ratio: auto;
+    align-self: stretch;
+}
+
+.joystickRow .turnButton {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+}
+/* 油门容器保持与图传同高 */
+.verticalThrottle {
+    height: 100%;
+    aspect-ratio: auto;
+    align-self: stretch;
+    grid-template-rows: 1fr 42px;
+}
+
+/* 油门滑轨使用固定高度，避免iPhone Safari自动缩短 */
+.verticalThrottle input[type="range"] {
+    width: 28px;
+    height: 360px;
+    min-height: 360px;
+    max-height: 360px;
+
+    align-self: start;
+    justify-self: center;
+
+    writing-mode: vertical-lr;
+    direction: rtl;
+    margin: 10px 0 0;
+}
