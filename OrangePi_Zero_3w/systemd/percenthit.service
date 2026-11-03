@@ -1,0 +1,15 @@
+[Unit]
+Description=100 Percent Hit Zero3W V2.3
+After=NetworkManager.service
+Wants=NetworkManager.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/orangepi/projects/100percenthit
+ExecStart=/home/orangepi/projects/100percenthit/.venv/bin/python -m app.main --config config/local.yaml
+Restart=on-failure
+RestartSec=2
+User=root
+
+[Install]
+WantedBy=multi-user.target

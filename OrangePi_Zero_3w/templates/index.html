@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>100% HIT</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="appShell">
+  <section class="topPanel">
+
+    <div class="statusGrid" aria-label="系统状态">
+      <button class="statusChip" id="networkBtn" title="切换网络"><span class="icon"><svg viewBox="0 0 24 24"><path d="M2.5 8.8a15 15 0 0 1 19 0M5.7 12.2a10.2 10.2 0 0 1 12.6 0M9 15.6a5.2 5.2 0 0 1 6 0"/><circle cx="12" cy="19" r="1.35" class="iconFill"/></svg></span><span id="network">--</span></button>
+      <div class="statusChip"><span class="icon"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2.5v2.5M15 2.5v2.5M9 19v2.5M15 19v2.5M2.5 9H5M2.5 15H5M19 9h2.5M19 15h2.5M9 9h6v6H9z"/></svg></span><span id="esp">--</span></div>
+      <div class="statusChip"><span class="icon"><svg viewBox="0 0 24 24"><path d="M4 7h4l1.4-2h5.2L16 7h4v12H4z"/><circle cx="12" cy="13" r="4"/></svg></span><span id="cam">--</span></div>
+      <div class="statusChip"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2l-2.1 5.5-5.5 2.1 2.1-5.5z"/></svg></span><span id="yaw">--°</span></div>
+      <button class="statusChip" id="lidarBtn" type="button" title="切换雷达保护"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l5.8-5.8"/></svg></span><span id="lidar">--</span></button>
+      <div class="statusChip"><span class="icon"><svg viewBox="0 0 28 24"><rect x="2" y="6" width="22" height="12" rx="2"/><path d="M24 10h2.2v4H24"/><rect id="batteryFill" class="iconFill" x="4" y="8" width="0" height="8" rx="1"/></svg></span><span id="battery">--%</span></div>
+    </div>
+
+  </section>
+
+  <section class="visionControlRow">
+    <div class="throttleCard verticalThrottle">
+      <input id="gas" type="range" min="0" max="100" step="10" value="40" aria-label="油门">
+      <output id="gp" for="gas">40%</output>
+    </div>
+
+    <section class="cameraCard">
+      <img id="video" src="/video" alt="实时摄像头画面">
+      <div class="liveDot" title="实时图传"></div>
+      <button id="sampleColorBtn" class="sampleColorBtn">取色</button>
+      <div id="sampleHint" class="sampleHint hidden">请点击小球中心</div>
+      <div id="cameraInfo" class="cameraInfo">-- × --</div>
+      <div id="streamFps" class="streamFps">图传 -- FPS</div>
+      <div id="ballInfo" class="ballInfo">球 --</div>
+    </section>
+
+    <div class="actionGrid sideActions">
+      <button id="shutdown" class="actionButton power" title="安全关机"><span class="actionIcon">⏻</span></button>
+      <button id="settingsBtn" class="actionButton neutral" title="设置"><span class="actionIcon">⚙</span></button>
+      <button id="stop" class="actionButton stop" title="立即停止"><span class="actionIcon">■</span></button>
+      <button id="stateBtn" class="actionButton state safe" title="状态 / ARM"><span class="actionIcon">◇</span><span id="mode">SAFE</span></button>
+    </div>
+  </section>
+
+  <section class="controlPanel">
+    <div class="joystickRow">
+      <button id="left" class="turnButton" aria-label="左转">↶</button>
+      <div id="joy" class="joystick" aria-label="二维摇杆"><div id="knob" class="knob"></div></div>
+      <button id="right" class="turnButton" aria-label="右转">↷</button>
+    </div>
+  </section>
+  <footer class="appFooter">100% HIT · M100 Auto Catcher · V2.5</footer>
+</main>
+
+<div id="networkModal" class="modal hidden">
+  <section class="sheet compactSheet">
+    <div class="sheetHead"><h2>网络</h2><button class="close iconClose">×</button></div>
+    <button class="settingLink" data-net="wifi"><span>⌁</span><b>家庭 Wi-Fi</b><i>›</i></button>
+    <button class="settingLink" data-net="ap"><span>◉</span><b>3W 热点</b><i>›</i></button>
+  </section>
+</div>
+
+<div id="settingsModal" class="modal hidden">
+  <section class="sheet settingsSheet">
+    <div class="sheetHead"><button class="close backButton">‹</button><h2>设置</h2><span class="headSpacer"></span></div>
+    <nav class="tabs">
+      <button data-tab="vision" class="active">视觉</button>
+      <button data-tab="lateral_tracking">X</button>
+      <button data-tab="oac">Y</button>
+      <button data-tab="imu">W</button>
+    </nav>
+    <div id="settingsRows" class="settingsRows"></div>
+    <div class="settingActions">
+      <button class="close secondary">完成</button>
+      <button id="applySettings" class="secondary">应用</button>
+      <button id="saveSettings" class="primary">保存</button>
+    </div>
+  </section>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
