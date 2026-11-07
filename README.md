@@ -6,7 +6,7 @@
 
 > 本仓库面向学习、研究和工程验证。其理论框架和代码可以在相似项目上复用。但所有速度、距离、增益、阈值及安全参数均应根据实际硬件重新调试和标定。本项目不是经过认证的工业安全系统。
 
-![alt text](OrangePi_Zero_3w/docs/Cobot.png)
+![Codbot](OrangePi_Zero_3w/docs/codbot.png)
 
 ## 1. 硬件清单
 
